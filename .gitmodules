@@ -1,0 +1,3 @@
+[submodule "siwe-oidc"]
+	path = siwe-oidc
+	url = https://github.com/spruceid/siwe-oidc.git
