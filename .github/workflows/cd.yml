@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-page:
+    runs-on: ubuntu-latest
+    name: Deploy Page
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Build Frontend
+        run: |
+          cd siwe-oidc/js/ui
+          npm install
+          npm run build
+        env:
+          FORTMATIC_KEY: ${{ secrets.FORTMATIC_KEY }}
+          INFURA_ID: ${{ secrets.INFURA_ID }}
+          PORTIS_ID: ${{ secrets.PORTIS_ID }}
+      - name: Publish Page
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages publish --project-name=ens-oidc ./siwe-oidc/static --commit-dirty=true
+  deploy-worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./siwe-oidc
+    name: Deploy Worker
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install wrangler
+        run: |
+          cargo install wrangler
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+      - name: Publish Worker
+        run: |
+          cp wrangler_example.toml wrangler.toml
+          sed -i 's/id = \"\", preview_id = \"\"/id = \"${{ secrets.KV_ID }}\", preview_id = \"${{ secrets.KV_ID }}\"/g' wrangler.toml
+          wrangler publish
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
