@@ -30,7 +30,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages publish --project-name=ens-oidc ./siwe-oidc/static --commit-dirty=true
+          workingDirectory: siwe-oidc
+          command: pages publish --project-name=ens-oidc static --commit-dirty=true
   deploy-worker:
     runs-on: ubuntu-latest
     defaults:
