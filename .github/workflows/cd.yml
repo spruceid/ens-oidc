@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  DOMAIN: "oidc.signinwithethereum.org"
+
 jobs:
   deploy-page:
     runs-on: ubuntu-latest
@@ -48,8 +51,10 @@ jobs:
       - name: Publish Worker
         run: |
           cp wrangler_example.toml wrangler.toml
+          sed -i '1s/^/routes = ["'$DOMAIN'\/.w*", "'$DOMAIN'\/j*", "'$DOMAIN'\/t*", "'$DOMAIN'\/a*", "'$DOMAIN'\/r*", "'$DOMAIN'\/u*", "'$DOMAIN'\/s*", "'$DOMAIN'\/c*"]\n/' wrangler.toml
           sed -i 's/id = \"\", preview_id = \"\"/id = \"${{ secrets.KV_ID }}\", preview_id = \"${{ secrets.KV_ID }}\"/g' wrangler.toml
           wrangler publish
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
