@@ -22,9 +22,7 @@ jobs:
           npm install
           npm run build
         env:
-          FORTMATIC_KEY: ${{ secrets.FORTMATIC_KEY }}
-          INFURA_ID: ${{ secrets.INFURA_ID }}
-          PORTIS_ID: ${{ secrets.PORTIS_ID }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
       - name: Publish Page
         uses: cloudflare/wrangler-action@2.0.0
         with:
